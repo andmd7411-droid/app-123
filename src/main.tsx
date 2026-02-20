@@ -5,15 +5,15 @@ import App from './App.tsx';
 import './index.css';
 
 // Placeholder compartments
-import ChatApp from './pages/ChatApp';
-import ClipperApp from './pages/ClipperApp';
-import JobTailorApp from './pages/JobTailorApp';
-import FreelancerApp from './pages/FreelancerApp';
-import BuilderApp from './pages/BuilderApp';
+import ChatApp from './pages/ChatApp.tsx';
+import ClipperApp from './pages/ClipperApp.tsx';
+import JobTailorApp from './pages/JobTailorApp.tsx';
+import FreelancerApp from './pages/FreelancerApp.tsx';
+import BuilderApp from './pages/BuilderApp.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/chat" element={<ChatApp />} />
