@@ -18,11 +18,7 @@ import {
     ExternalLink,
     ChevronRight,
     DollarSign,
-    Info,
     X,
-    Search,
-    Filter,
-    MoreVertical,
     Briefcase,
     Trash2,
     Download
@@ -192,7 +188,7 @@ export default function FreelancerApp() {
         setShowClientModal(false);
     };
 
-    const cn = (...inputs: any[]) => inputs.filter(Boolean).join(' ');
+    const cn = (...inputs: (string | boolean | undefined | null)[]) => inputs.filter(Boolean).join(' ');
 
     const renderOverview = () => (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-7xl mx-auto space-y-8">
@@ -384,7 +380,7 @@ export default function FreelancerApp() {
                 <aside className="hidden lg:flex w-64 flex-col bg-[#0D0D0F] border-r border-white/5 p-4 py-8 shadow-2xl">
                     <nav className="space-y-1">
                         {[{ icon: BarChart3, label: t.nav[0] }, { icon: FileText, label: t.nav[1] }, { icon: Wallet, label: t.nav[2] }, { icon: Users, label: t.nav[3] }, { icon: TrendingUp, label: t.nav[4] }].map((item, idx) => (
-                            <button key={item.label} onClick={() => setActiveTab(idx)} className={cn("w-full flex items-center gap-3 px-4 py-4 rounded-2xl transition-all", activeTab === idx ? "bg-blue-600 text-white font-black shadow-lg shadow-blue-500/20" : "text-gray-500 hover:bg-white/5 hover:text-white hover:translate-x-1")}>
+                            <button key={item.label} onClick={() => setActiveTab(idx)} className={cn("w-full flex items-center gap-3 px-4 py-4 rounded-2xl transition-all", activeTab === idx ? "bg-blue-600 text-white font-black shadow-lg shadow-blue-500/20" : "text-gray-500 hover:bg-white/5 hover:text-white hover:translate-x-1")} title={item.label}>
                                 <item.icon size={18} /> <span className="text-[11px] font-black uppercase tracking-widest">{item.label}</span>
                             </button>
                         ))}
