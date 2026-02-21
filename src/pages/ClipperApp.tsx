@@ -24,69 +24,69 @@ const translations = {
     en: {
         back: "Back to Hub",
         title: "Viral Studio Pro",
-        subtitle: "AI-Powered Vertical Content Engine",
+        subtitle: "Neural Video Engine",
         steps: ['Upload', 'Analyze', 'Studio', 'Export'],
-        uploadTitle: "Drop your Masterpiece",
-        uploadDesc: "Drag & drop your long-form video. AI will detect high-energy moments and format them for social success.",
+        uploadTitle: "Upload Masterpiece",
+        uploadDesc: "AI will detect high-energy moments and format them for social success.",
         uploadBtn: "Select Video File",
-        analyzeTitle: "Neural Moment Detection",
-        analyzeDesc: "Our AI is scanning your footage for hooks, facial triggers, and audience retention zones.",
-        configTitle: "Viral Studio",
-        configDesc: "Customize your viral clips with AI-generated captions and dynamic focus.",
+        analyzeTitle: "Moment Detection",
+        analyzeDesc: "Scanning footage for hooks and retention zones...",
+        configTitle: "Video Studio",
+        configDesc: "Customize your viral clips with AI captions.",
         captions: "Interactive Captions",
         captionStyles: ['Hormozi Punch', 'Modern Minimal', 'Neon Impact'],
-        autoCrop: "Dynamic Face-Focus",
+        autoCrop: "Dynamic Focus",
         focusMode: "Smart Cropping: Enabled",
-        sensitivity: "Motion Sensitivity",
+        sensitivity: "Sensitivity",
         generateBtn: "RENDER VIRAL CLIPS",
         processing: "RENDERING",
-        readyTitle: "Viral Package Ready!",
-        readyDesc: (count: number) => `Success! ${count} high-retention clips are ready for TikTok, Reels, and Shorts.`,
+        readyTitle: "Ready to Post!",
+        readyDesc: (count: number) => `Success! ${count} viral clips are ready.`,
         momentTitle: (i: number) => `Viral Hook #${i}`,
-        processAlt: "Studio New Project",
-        downloadAll: "EXPORT ALL AS .ZIP",
+        processAlt: "New Project",
+        downloadAll: "DOWNLOAD PACKAGE",
         placeholderVideo: "No video loaded",
         logs: [
             "Initializing Neural Engine...",
-            "Analyzing audio waveforms for hooks...",
-            "Detecting speaker faces...",
-            "Optimizing vertical aspect ratio...",
-            "Generating dynamic captions...",
-            "Finalizing viral moments..."
+            "Analyzing waveforms...",
+            "Detecting speaker...",
+            "Optimizing ratio...",
+            "Generating captions...",
+            "Finalizing..."
         ]
     },
     fr: {
-        back: "Retour au Hub",
+        back: "Retour",
         title: "Viral Studio Pro",
-        subtitle: "Moteur de Contenu Vertical par IA",
+        subtitle: "Moteur Vidéo Neuronal",
         steps: ['Chargement', 'Analyse', 'Studio', 'Export'],
-        uploadTitle: "Déposez votre Chef-d'œuvre",
-        uploadDesc: "Glissez votre vidéo. L'IA détectera les moments forts et les formatera pour un succès garanti.",
+        uploadTitle: "Charger la Vidéo",
+        uploadDesc: "L'IA détectera les moments forts pour TikTok, Reels et Shorts.",
         uploadBtn: "Choisir un Fichier",
-        analyzeTitle: "Détection de Moments Neuronale",
-        analyzeDesc: "Notre IA scanne votre contenu pour trouver des switchs, des expressions et des zones de rétention.",
-        configTitle: "Studio Viral",
-        configDesc: "Personnalisez vos clips avec des légendes générées par l'IA et un focus dynamique.",
+        analyzeTitle: "Détection de Moments",
+        analyzeDesc: "Analyse des hooks et des zones de rétention...",
+        configTitle: "Studio Vidéo",
+        configDesc: "Personnalisez vos clips avec des légendes IA.",
         captions: "Légendes Interactives",
-        captionStyles: ['Punch Hormozi', 'Modern Minimal', 'Impact Néon'],
-        autoCrop: "Face-Focus Dynamique",
+        captionStyles: ['Hormozi Punch', 'Modern Minimal', 'Impact Néon'],
+        autoCrop: "Focus Dynamique",
         focusMode: "Recadrage Intelligent : Activé",
-        sensitivity: "Sensibilité au Mouvement",
+        sensitivity: "Sensibilité",
         generateBtn: "GÉNÉRER LES CLIPS",
         processing: "GÉNÉRATION",
-        readyTitle: "Pack Viral Prêt !",
-        readyDesc: (count: number) => `Succès ! ${count} clips à haute rétention sont prêts pour TikTok, Reels et Shorts.`,
-        momentTitle: (i: number) => `Hook Viral #${i}`,
-        processAlt: "Nouveau Projet Studio",
-        downloadAll: "TOUT EXPORTER (.ZIP)",
-        placeholderVideo: "Aucune vidéo chargée",
+        readyTitle: "Prêt à Publier !",
+        readyDesc: (count: number) => `Succès ! ${count} clips sont prêts.`,
+        momentTitle: (i: number) => `Moment Viral #${i}`,
+        processAlt: "Nouveau Projet",
+        downloadAll: "TÉLÉCHARGER TOUT",
+        placeholderVideo: "Aucune vidéo",
         logs: [
-            "Initialisation du moteur neuronal...",
-            "Analyse des ondes audio pour les hooks...",
-            "Détection des visages...",
-            "Optimisation du ratio vertical...",
-            "Génération des légendes dynamiques...",
-            "Finalisation des moments viraux..."
+            "Initialisation...",
+            "Analyse audio...",
+            "Détection visage...",
+            "Optimisation ratio...",
+            "Légendes IA...",
+            "Finalisation..."
         ]
     }
 };
@@ -95,10 +95,7 @@ const VIRAL_CAPTIONS = [
     "THIS IS INSANE!",
     "WAIT FOR IT...",
     "MIND BLOWN!",
-    "THE SECRET IS...",
-    "WATCH TILL END",
-    "POV: YOU WIN",
-    "HUGE UPDATE!"
+    "POV: YOU WIN"
 ];
 
 export default function ClipperApp() {
@@ -121,470 +118,393 @@ export default function ClipperApp() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
 
+    // Caption Loop
     useEffect(() => {
+        let timer: any;
         if (isPlaying && step === 'config') {
-            const interval = setInterval(() => {
+            timer = setInterval(() => {
                 setActiveCaption(prev => (prev + 1) % VIRAL_CAPTIONS.length);
             }, 800);
-            return () => clearInterval(interval);
         }
+        return () => clearInterval(timer);
     }, [isPlaying, step]);
 
+    // Handle Upload
     const handleFileUpload = (e: any) => {
-        let file: File | null = null;
-        if (e.target && e.target.files && e.target.files[0]) {
-            file = e.target.files[0];
-        } else if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
-            file = e.dataTransfer.files[0];
-        }
-
+        const file = (e.target?.files?.[0] || e.dataTransfer?.files?.[0]);
         if (file && file.type.startsWith('video/')) {
-            console.log("File uploaded:", file.name);
+            const url = URL.createObjectURL(file);
             setVideoFile(file);
-            setVideoUrl(URL.createObjectURL(file));
+            setVideoUrl(url);
             setStep('analyze');
             startAnalysis();
         }
     };
 
+    // Simulation Phase 1
     const startAnalysis = () => {
-        setIsProcessing(true);
-        let p = 0;
-        let logIndex = 0;
-        const interval = setInterval(() => {
-            p += 5;
-            if (p >= 100) {
-                p = 100;
-                clearInterval(interval);
-                setTimeout(() => {
-                    setIsProcessing(false);
-                    setStep('config');
-                }, 500);
-            }
-            if (p > (logIndex + 1) * 16.6 && logIndex < t.logs.length - 1) {
-                logIndex++;
-                setCurrentLog(logIndex);
-            }
-            setProgress(p);
-        }, 200);
-    };
-
-    const togglePlay = (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (videoRef.current) {
-            if (isPlaying) videoRef.current.pause();
-            else videoRef.current.play();
-            setIsPlaying(!isPlaying);
-        }
-    };
-
-    const triggerDownload = (blob: Blob | null, fileName: string) => {
-        console.log("Triggering download...");
-        const finalBlob = blob || new Blob(["Viral Content Placeholder"], { type: 'video/mp4' });
-        const url = URL.createObjectURL(finalBlob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = fileName;
-        link.style.display = 'none';
-        document.body.appendChild(link);
-        link.click();
-        setTimeout(() => {
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-        }, 1000);
-    };
-
-    const handleExport = (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log("Export started");
         setIsProcessing(true);
         setProgress(0);
         let p = 0;
         const interval = setInterval(() => {
-            p += 5;
+            p += 2;
+            setProgress(p);
+            if (p >= 100) {
+                clearInterval(interval);
+                setIsProcessing(false);
+                setStep('config');
+            }
+            setCurrentLog(Math.floor((p / 100) * (t.logs.length - 1)));
+        }, 100);
+    };
+
+    // Simulation Phase 2
+    const handleExport = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (isProcessing) return;
+
+        setIsProcessing(true);
+        setProgress(0);
+        let p = 0;
+        const interval = setInterval(() => {
+            p += 4;
             setProgress(p);
             if (p >= 100) {
                 clearInterval(interval);
                 setIsProcessing(false);
                 setStep('export');
             }
-        }, 50);
+        }, 80);
     };
 
-    const reset = (e: React.MouseEvent) => {
+    const togglePlay = (e?: React.MouseEvent) => {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
+        if (!videoRef.current) return;
+
+        if (isPlaying) {
+            videoRef.current.pause();
+        } else {
+            videoRef.current.play().catch(console.error);
+        }
+        setIsPlaying(!isPlaying);
+    };
+
+    const onDownload = (e: React.MouseEvent, i: number) => {
         e.preventDefault();
         e.stopPropagation();
+        const blob = videoFile || new Blob(["Simulated Video Data"], { type: "video/mp4" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Viral_Clip_${i}.mp4`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+
+    const reset = (e?: React.MouseEvent) => {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
         setStep('upload');
         setVideoFile(null);
         setVideoUrl(null);
-        setProgress(0);
         setIsProcessing(false);
+        setProgress(0);
+        setIsPlaying(false);
     };
 
     return (
-        <div className="flex flex-col h-screen bg-[#0A0A0B] text-white selection:bg-rose-500/30 font-outfit">
-            {/* Header */}
-            <header className="flex-none flex items-center justify-between px-8 py-4 bg-[#0D0D0F]/90 backdrop-blur-xl border-b border-white/5 z-50">
-                <div className="flex items-center gap-6">
+        <div className="flex flex-col min-h-screen bg-[#0A0A0B] text-white font-outfit overflow-x-hidden">
+            {/* Nav Bar */}
+            <nav className="sticky top-0 z-[100] w-full px-6 py-4 bg-[#0D0D0F]/95 backdrop-blur-md border-b border-white/5 flex justify-between items-center">
+                <div className="flex items-center gap-4">
                     <button
-                        type="button"
-                        title={t.back}
                         onClick={() => navigate('/')}
-                        className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl transition-all text-gray-400 hover:text-white border border-white/5"
+                        className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl transition-all cursor-pointer"
+                        title={t.back}
                     >
                         <ArrowLeft size={20} />
                     </button>
                     <div>
-                        <div className="flex items-center gap-3">
-                            <div className="p-1.5 bg-rose-500/10 rounded-lg">
-                                <Video className="text-rose-400 w-4 h-4" />
-                            </div>
-                            <h1 className="text-lg font-bold tracking-tight">{t.title}</h1>
-                        </div>
+                        <h1 className="text-xl font-black tracking-tight">{t.title}</h1>
+                        <p className="text-[10px] text-rose-500 font-bold uppercase tracking-widest">{t.subtitle}</p>
                     </div>
                 </div>
 
-                <div className="hidden md:flex items-center gap-2">
+                <div className="hidden md:flex items-center gap-6">
                     {t.steps.map((s, i) => {
                         const stepKeys = ['upload', 'analyze', 'config', 'export'];
-                        const isActive = step === stepKeys[i];
-                        const isDone = stepKeys.indexOf(step) > i;
+                        const active = step === stepKeys[i];
+                        const done = stepKeys.indexOf(step) > i;
                         return (
-                            <React.Fragment key={s}>
-                                <div className="flex items-center gap-2 px-3 py-1.5 transition-all">
-                                    <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${isActive ? 'bg-rose-500 text-white' : isDone ? 'bg-emerald-500 text-white' : 'bg-white/5 text-gray-600'}`}>
-                                        {isDone ? <CheckCircle2 size={12} /> : i + 1}
-                                    </div>
-                                    <span className={`text-[10px] font-bold uppercase tracking-widest ${isActive ? 'text-white' : 'text-gray-600'}`}>
-                                        {s}
-                                    </span>
+                            <div key={s} className="flex items-center gap-2">
+                                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black ${active ? 'bg-rose-500 text-white' : done ? 'bg-emerald-500 text-white' : 'bg-white/5 text-gray-600'}`}>
+                                    {done ? <CheckCircle2 size={12} /> : i + 1}
                                 </div>
-                                {i < 3 && <div className="w-4 h-px bg-white/5" />}
-                            </React.Fragment>
+                                <span className={`text-[10px] font-bold uppercase tracking-widest ${active ? 'text-white' : 'text-gray-500'}`}>{s}</span>
+                            </div>
                         );
                     })}
                 </div>
-            </header>
+            </nav>
 
-            {/* Main Area */}
-            <main className="flex-1 relative overflow-y-auto no-scrollbar">
-                {/* Background Decor */}
-                <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                    <div className="absolute top-1/4 -right-20 w-[600px] h-[600px] bg-rose-500/5 blur-[120px] rounded-full" />
-                    <div className="absolute bottom-1/4 -left-20 w-[500px] h-[500px] bg-indigo-500/5 blur-[120px] rounded-full" />
-                </div>
-
-                <div className="relative z-10 min-h-full p-6 md:p-12 flex flex-col justify-center items-center">
-                    <AnimatePresence mode="wait">
-                        {step === 'upload' && (
-                            <motion.div
-                                key="upload"
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.95 }}
-                                className="w-full max-w-4xl"
+            {/* Main Content */}
+            <main className="flex-1 w-full max-w-7xl mx-auto px-6 py-12">
+                <AnimatePresence mode="wait">
+                    {step === 'upload' && (
+                        <motion.section
+                            key="u"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="w-full"
+                        >
+                            <div
+                                onClick={() => fileInputRef.current?.click()}
+                                className="group relative w-full h-[500px] rounded-[60px] border-2 border-dashed border-white/10 hover:border-rose-500/50 bg-[#0D0D0F]/50 flex flex-col items-center justify-center text-center p-12 cursor-pointer transition-all duration-500"
                             >
-                                <div
-                                    onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                                    onDrop={(e) => { e.preventDefault(); e.stopPropagation(); handleFileUpload(e); }}
-                                    onClick={() => fileInputRef.current?.click()}
-                                    className="group relative border-2 border-dashed border-white/10 hover:border-rose-500/50 rounded-[48px] p-16 md:p-24 text-center cursor-pointer transition-all bg-[#0D0D0F]/50 backdrop-blur-sm"
-                                >
-                                    <div className="w-24 h-24 bg-rose-500/10 rounded-3xl flex items-center justify-center mx-auto mb-10 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                                        <Upload className="text-rose-400 w-10 h-10" />
-                                    </div>
-                                    <h2 className="text-4xl font-black mb-6 tracking-tight">{t.uploadTitle}</h2>
-                                    <p className="text-gray-500 text-lg mb-10 max-w-lg mx-auto leading-relaxed">
-                                        {t.uploadDesc}
-                                    </p>
-                                    <div className="inline-flex items-center gap-4 px-10 py-5 bg-rose-600 hover:bg-rose-700 rounded-2xl font-black text-sm uppercase tracking-widest transition-all shadow-xl shadow-rose-500/20 active:scale-95">
-                                        <Play size={18} className="fill-current" />
-                                        {t.uploadBtn}
-                                    </div>
-                                    <input
-                                        type="file"
-                                        ref={fileInputRef}
-                                        className="hidden"
-                                        accept="video/*"
-                                        onChange={handleFileUpload}
+                                <div className="absolute inset-0 bg-rose-500/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-[60px]" />
+                                <div className="w-24 h-24 bg-rose-500/10 rounded-3xl flex items-center justify-center mb-8 group-hover:scale-110 group-hover:rotate-3 transition-transform">
+                                    <Upload className="text-rose-500 w-10 h-10" />
+                                </div>
+                                <h2 className="text-4xl md:text-5xl font-black mb-4 tracking-tighter italic uppercase">{t.uploadTitle}</h2>
+                                <p className="text-gray-500 text-lg mb-10 max-w-md">{t.uploadDesc}</p>
+                                <button className="px-12 py-5 bg-rose-600 hover:bg-rose-700 rounded-3xl font-black text-sm uppercase tracking-widest transition-all shadow-2xl shadow-rose-500/30">
+                                    {t.uploadBtn}
+                                </button>
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    className="hidden"
+                                    accept="video/*"
+                                    onChange={handleFileUpload}
+                                />
+                            </div>
+                        </motion.section>
+                    )}
+
+                    {step === 'analyze' && (
+                        <motion.section
+                            key="a"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="flex flex-col items-center py-20"
+                        >
+                            <div className="relative w-64 h-64 mb-16">
+                                <svg className="w-full h-full -rotate-90">
+                                    <circle cx="128" cy="128" r="120" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-white/5" />
+                                    <motion.circle
+                                        cx="128" cy="128" r="120"
+                                        stroke="currentColor" strokeWidth="8" fill="transparent"
+                                        strokeDasharray="754"
+                                        strokeDashoffset={754 - (754 * progress) / 100}
+                                        className="text-rose-500"
+                                        strokeLinecap="round"
                                     />
+                                </svg>
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <Zap className="text-rose-500 w-16 h-16 animate-pulse" />
                                 </div>
-                            </motion.div>
-                        )}
+                            </div>
+                            <h2 className="text-4xl font-black italic uppercase mb-4">{t.analyzeTitle}</h2>
+                            <p className="text-gray-500 mb-8">{t.analyzeDesc}</p>
+                            <div className="w-full max-w-lg p-6 bg-white/5 rounded-3xl font-mono text-xs flex gap-4 items-center">
+                                <span className="text-rose-500 shrink-0">[IA_SCAN]</span>
+                                <span className="text-gray-400 truncate">{t.logs[currentLog]}</span>
+                            </div>
+                        </motion.section>
+                    )}
 
-                        {step === 'analyze' && (
-                            <motion.div
-                                key="analyze"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                className="w-full max-w-2xl flex flex-col items-center space-y-12"
-                            >
-                                <div className="relative w-48 h-48">
-                                    <svg className="w-full h-full rotate-[-90deg]">
-                                        <circle cx="96" cy="96" r="88" className="stroke-white/5 fill-none" strokeWidth="8" />
-                                        <motion.circle
-                                            cx="96" cy="96" r="88"
-                                            className="stroke-rose-500 fill-none"
-                                            strokeWidth="8"
-                                            strokeDasharray="553"
-                                            strokeDashoffset={553 - (553 * progress) / 100}
-                                            strokeLinecap="round"
+                    {step === 'config' && (
+                        <motion.section
+                            key="c"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="grid grid-cols-1 lg:grid-cols-2 gap-16"
+                        >
+                            {/* Player */}
+                            <div className="flex flex-col items-center gap-8">
+                                <div className="relative w-full max-w-[340px] aspect-[9/16] bg-black rounded-[60px] border-[12px] border-[#1C1C1E] overflow-hidden group shadow-2xl shadow-black/50">
+                                    {videoUrl ? (
+                                        <video ref={videoRef} src={videoUrl} className="w-full h-full object-cover" onEnded={() => setIsPlaying(false)} playsInline />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-gray-800">
+                                            <Video size={48} />
+                                        </div>
+                                    )}
+
+                                    {/* Captions Overlay */}
+                                    {isPlaying && (
+                                        <div className="absolute inset-x-4 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                                            <motion.span
+                                                key={activeCaption}
+                                                initial={{ scale: 0.8, opacity: 0 }}
+                                                animate={{ scale: 1.3, opacity: 1 }}
+                                                className="text-3xl font-black italic uppercase text-center drop-shadow-[0_4px_12px_rgba(0,0,0,1)]"
+                                                style={{ color: captionColor, WebkitTextStroke: '2px black' }}
+                                            >
+                                                {VIRAL_CAPTIONS[activeCaption]}
+                                            </motion.span>
+                                        </div>
+                                    )}
+
+                                    {/* Play Overlay */}
+                                    <div
+                                        onClick={togglePlay}
+                                        className={`absolute inset-0 z-10 flex items-center justify-center cursor-pointer transition-all duration-300 ${isPlaying ? 'bg-transparent opacity-0 hover:opacity-100 hover:bg-black/20' : 'bg-black/40 opacity-100'}`}
+                                    >
+                                        <div className="w-20 h-20 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20">
+                                            {isPlaying ? <Pause size={32} /> : <Play size={32} className="ml-2" />}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex gap-4 p-4 bg-white/5 rounded-[32px] border border-white/5">
+                                    {['#fbbf24', '#ffffff', '#fb7185', '#38bdf8'].map(c => (
+                                        <button
+                                            key={c}
+                                            onClick={() => setCaptionColor(c)}
+                                            className={`w-10 h-10 rounded-full border-4 transition-all ${captionColor === c ? 'border-white scale-110 shadow-lg' : 'border-transparent'}`}
+                                            style={{ backgroundColor: c }}
+                                            title="Pick color"
                                         />
-                                    </svg>
-                                    <div className="absolute inset-0 flex items-center justify-center">
-                                        <Zap className="text-rose-500 w-12 h-12 animate-pulse" />
-                                    </div>
-                                </div>
-                                <div className="text-center space-y-4">
-                                    <h2 className="text-3xl font-black uppercase tracking-tighter">{t.analyzeTitle}</h2>
-                                    <p className="text-gray-500">{t.analyzeDesc}</p>
-                                </div>
-                                <div className="w-full bg-white/[0.02] border border-white/5 p-6 rounded-3xl min-h-[80px] flex items-center">
-                                    <motion.div
-                                        key={currentLog}
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        className="flex items-center gap-4 text-xs font-mono"
-                                    >
-                                        <span className="text-rose-500 font-bold">[NEURAL_PROCESS]</span>
-                                        <span className="text-gray-400">{t.logs[currentLog]}</span>
-                                    </motion.div>
-                                </div>
-                            </motion.div>
-                        )}
-
-                        {step === 'config' && (
-                            <motion.div
-                                key="config"
-                                initial={{ opacity: 0, scale: 0.98 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
-                            >
-                                {/* Left: Video Preview */}
-                                <div className="flex flex-col items-center gap-8">
-                                    <div className="relative w-full max-w-[340px] aspect-[9/16] bg-black border-[12px] border-[#1C1C1E] rounded-[56px] overflow-hidden shadow-2xl group">
-                                        {videoUrl ? (
-                                            <>
-                                                <video
-                                                    ref={videoRef}
-                                                    src={videoUrl}
-                                                    className="w-full h-full object-cover"
-                                                    onEnded={() => setIsPlaying(false)}
-                                                    playsInline
-                                                />
-                                                <div className="absolute inset-x-4 top-1/2 -translate-y-1/2 pointer-events-none z-30">
-                                                    <AnimatePresence>
-                                                        {isPlaying && (
-                                                            <motion.div
-                                                                key={activeCaption}
-                                                                initial={{ scale: 0.8, opacity: 0 }}
-                                                                animate={{ scale: 1.2, opacity: 1 }}
-                                                                exit={{ scale: 1.5, opacity: 0 }}
-                                                                className="text-center"
-                                                            >
-                                                                <span
-                                                                    className="text-3xl font-black italic uppercase tracking-tighter drop-shadow-lg"
-                                                                    style={{ color: captionColor, WebkitTextStroke: '2px black' }}
-                                                                >
-                                                                    {VIRAL_CAPTIONS[activeCaption]}
-                                                                </span>
-                                                            </motion.div>
-                                                        )}
-                                                    </AnimatePresence>
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <div className="w-full h-full flex flex-col items-center justify-center text-gray-800">
-                                                <Video size={48} className="mb-4" />
-                                                <span className="text-[10px] font-black uppercase tracking-widest">{t.placeholderVideo}</span>
-                                            </div>
-                                        )}
-                                        <button
-                                            type="button"
-                                            title={isPlaying ? "Pause" : "Play"}
-                                            onClick={togglePlay}
-                                            className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity z-40"
-                                        >
-                                            <div className="w-20 h-20 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20">
-                                                {isPlaying ? <Pause className="fill-white" /> : <Play className="fill-white ml-2" />}
-                                            </div>
-                                        </button>
-                                    </div>
-                                    <div className="flex gap-4 p-3 bg-white/5 rounded-3xl border border-white/5">
-                                        {['#fbbf24', '#ffffff', '#fb7185', '#38bdf8'].map(c => (
-                                            <button
-                                                key={c}
-                                                type="button"
-                                                title={`Color ${c}`}
-                                                onClick={() => setCaptionColor(c)}
-                                                className={`w-10 h-10 rounded-full border-2 transition-all ${captionColor === c ? 'border-white scale-110 shadow-lg' : 'border-transparent scale-90'}`}
-                                                style={{ backgroundColor: c }}
-                                            />
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Right: Controls */}
-                                <div className="space-y-10">
-                                    <div className="flex justify-between items-start">
-                                        <div className="space-y-2">
-                                            <h2 className="text-4xl font-black uppercase tracking-tighter italic">{t.configTitle}</h2>
-                                            <p className="text-gray-500">{t.configDesc}</p>
-                                        </div>
-                                        <button
-                                            type="button"
-                                            title="Reset"
-                                            onClick={reset}
-                                            className="p-4 bg-white/5 hover:bg-rose-500/10 border border-white/5 rounded-2xl transition-all"
-                                        >
-                                            <RotateCcw size={20} className="text-gray-400" />
-                                        </button>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        <div className="space-y-6">
-                                            <div className="flex items-center gap-3 text-rose-400">
-                                                <Layers size={18} />
-                                                <h3 className="text-xs font-black uppercase tracking-widest">{t.captions}</h3>
-                                            </div>
-                                            <div className="space-y-3">
-                                                {t.captionStyles.map(s => (
-                                                    <button
-                                                        key={s}
-                                                        type="button"
-                                                        className={`w-full text-left p-5 rounded-3xl border transition-all text-xs font-bold uppercase ${s.includes('Hormozi') ? 'bg-rose-600/10 border-rose-500/30 text-white shadow-lg' : 'bg-white/[0.02] border-white/5 text-gray-500 hover:bg-white/5'}`}
-                                                    >
-                                                        {s}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <div className="space-y-6">
-                                            <div className="flex items-center gap-3 text-rose-400">
-                                                <Settings2 size={18} />
-                                                <h3 className="text-xs font-black uppercase tracking-widest">{t.autoCrop}</h3>
-                                            </div>
-                                            <div className="p-8 bg-white/[0.02] border border-white/5 rounded-[40px] space-y-8">
-                                                <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-gray-500">
-                                                    <span>AI Status</span>
-                                                    <span className="text-emerald-500">ACTIVE</span>
-                                                </div>
-                                                <div className="space-y-3">
-                                                    <div className="flex justify-between text-[10px] font-bold text-gray-600">
-                                                        <span>{t.sensitivity}</span>
-                                                        <span className="text-white">85%</span>
-                                                    </div>
-                                                    <div className="h-1 w-full bg-white/5 rounded-full">
-                                                        <div className="h-full w-[85%] bg-rose-500 rounded-full" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <button
-                                        type="button"
-                                        onClick={handleExport}
-                                        disabled={isProcessing}
-                                        className="w-full relative py-6 bg-rose-600 hover:bg-rose-700 disabled:bg-white/5 disabled:text-gray-700 rounded-[32px] font-black text-xl uppercase italic tracking-tighter transition-all shadow-2xl shadow-rose-500/20 active:scale-[0.98]"
-                                    >
-                                        <div className="relative z-10 flex items-center justify-center gap-4">
-                                            {isProcessing ? (
-                                                <>
-                                                    <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                                                    <span>{t.processing} {progress}%</span>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Sparkles size={24} className="fill-current" />
-                                                    <span>{t.generateBtn}</span>
-                                                </>
-                                            )}
-                                        </div>
-                                        {isProcessing && (
-                                            <div className="absolute inset-0 bg-white/10" style={{ width: `${progress}%`, transition: 'width 0.1s linear' }} />
-                                        )}
-                                    </button>
-                                </div>
-                            </motion.div>
-                        )}
-
-                        {step === 'export' && (
-                            <motion.div
-                                key="export"
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="w-full max-w-5xl flex flex-col items-center py-12"
-                            >
-                                <div className="text-center mb-16 space-y-4">
-                                    <div className="w-24 h-24 bg-emerald-500/10 rounded-[32px] flex items-center justify-center mx-auto mb-8 shadow-inner shadow-emerald-500/20">
-                                        <CheckCircle2 className="text-emerald-400 w-12 h-12" />
-                                    </div>
-                                    <h2 className="text-5xl font-black uppercase italic tracking-tighter">{t.readyTitle}</h2>
-                                    <p className="text-gray-500 text-lg max-w-xl mx-auto">{t.readyDesc(3)}</p>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full mb-16">
-                                    {[1, 2, 3].map(i => (
-                                        <div key={i} className="group p-6 bg-white/[0.02] border border-white/5 hover:border-emerald-500/50 rounded-[48px] transition-all">
-                                            <div className="aspect-[9/16] bg-black rounded-[32px] mb-6 overflow-hidden relative border border-white/5">
-                                                {videoUrl && <video src={videoUrl} className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity" muted />}
-                                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black/20 transition-all pointer-events-none">
-                                                    <Play className="fill-white" size={32} />
-                                                </div>
-                                            </div>
-                                            <div className="flex justify-between items-center">
-                                                <div className="text-left">
-                                                    <h4 className="font-bold uppercase tracking-tight text-sm">{t.momentTitle(i)}</h4>
-                                                    <span className="text-[10px] text-gray-600 font-bold">15s • 4K HDR</span>
-                                                </div>
-                                                <button
-                                                    type="button"
-                                                    title="Download"
-                                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); triggerDownload(videoFile, `Viral_Moment_${i}.mp4`); }}
-                                                    className="p-4 bg-emerald-500 hover:bg-emerald-600 transition-all rounded-2xl text-white shadow-lg active:scale-90"
-                                                >
-                                                    <Download size={20} />
-                                                </button>
-                                            </div>
-                                        </div>
                                     ))}
                                 </div>
+                            </div>
 
-                                <div className="flex flex-col md:flex-row gap-6">
-                                    <button
-                                        type="button"
-                                        onClick={reset}
-                                        className="px-12 py-5 bg-white/5 hover:bg-white/10 rounded-[32px] font-black uppercase text-sm tracking-widest transition-all"
-                                    >
-                                        {t.processAlt}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); triggerDownload(null, "Neural_Viral_Batch.zip"); }}
-                                        className="px-12 py-5 bg-emerald-600 hover:bg-emerald-700 rounded-[32px] font-black uppercase text-sm tracking-widest transition-all shadow-xl shadow-emerald-500/20 flex items-center gap-3 active:scale-95"
-                                    >
-                                        <Download size={20} />
-                                        {t.downloadAll}
+                            {/* Options */}
+                            <div className="flex flex-col gap-10">
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <h2 className="text-5xl font-black italic uppercase tracking-tighter mb-2">{t.configTitle}</h2>
+                                        <p className="text-gray-500">{t.configDesc}</p>
+                                    </div>
+                                    <button onClick={() => reset()} className="p-4 bg-white/5 hover:bg-rose-500/10 rounded-2xl transition-all cursor-pointer">
+                                        <RotateCcw className="text-gray-400" />
                                     </button>
                                 </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <div className="space-y-6">
+                                        <h3 className="text-xs font-black uppercase tracking-widest text-rose-500">{t.captions}</h3>
+                                        <div className="flex flex-col gap-3">
+                                            {t.captionStyles.map(s => (
+                                                <button key={s} className={`p-5 rounded-2xl border text-left text-xs font-bold uppercase transition-all ${s.includes('Hormozi') ? 'bg-rose-500/10 border-rose-500/50 text-white' : 'bg-white/5 border-white/5 text-gray-500 hover:bg-white/10'}`}>
+                                                    {s}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="space-y-6">
+                                        <h3 className="text-xs font-black uppercase tracking-widest text-rose-500">{t.autoCrop}</h3>
+                                        <div className="p-8 bg-white/5 rounded-[40px] space-y-8 border border-white/5">
+                                            <div className="flex justify-between text-[10px] font-black uppercase text-gray-500">
+                                                <span>Status</span>
+                                                <span className="text-emerald-500 italic">AL_LOCK_ON</span>
+                                            </div>
+                                            <div className="space-y-3">
+                                                <div className="flex justify-between text-[10px] uppercase font-bold text-gray-400">
+                                                    <span>{t.sensitivity}</span>
+                                                    <span>85%</span>
+                                                </div>
+                                                <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                                                    <div className="h-full w-[85%] bg-rose-500" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button
+                                    onClick={handleExport}
+                                    disabled={isProcessing}
+                                    className="w-full relative py-7 bg-rose-600 hover:bg-rose-700 disabled:bg-white/5 disabled:text-gray-700 rounded-[40px] font-black text-2xl uppercase italic tracking-tighter transition-all shadow-2xl shadow-rose-500/40 active:scale-[0.98] overflow-hidden"
+                                >
+                                    <span className="relative z-10 flex items-center justify-center gap-4">
+                                        {isProcessing ? (
+                                            <>
+                                                <div className="w-6 h-6 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+                                                {t.processing} {progress}%
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Sparkles className="fill-current" />
+                                                {t.generateBtn}
+                                            </>
+                                        )}
+                                    </span>
+                                    {isProcessing && (
+                                        <div className="absolute inset-0 bg-white/10 transition-all duration-100" style={{ width: `${progress}%` }} />
+                                    )}
+                                </button>
+                            </div>
+                        </motion.section>
+                    )}
+
+                    {step === 'export' && (
+                        <motion.section
+                            key="e"
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="flex flex-col items-center py-10"
+                        >
+                            <div className="text-center mb-16">
+                                <div className="w-24 h-24 bg-emerald-500/10 rounded-[32px] flex items-center justify-center mx-auto mb-8">
+                                    <CheckCircle2 size={48} className="text-emerald-500" />
+                                </div>
+                                <h2 className="text-6xl font-black uppercase italic tracking-tighter mb-4">{t.readyTitle}</h2>
+                                <p className="text-gray-500 text-xl">{t.readyDesc(3)}</p>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full mb-16">
+                                {[1, 2, 3].map(i => (
+                                    <div key={i} className="group p-6 bg-white/5 border border-white/5 hover:border-emerald-500/50 rounded-[48px] transition-all">
+                                        <div className="aspect-[9/16] bg-black rounded-[32px] mb-6 overflow-hidden relative">
+                                            {videoUrl && <video src={videoUrl} className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity" muted />}
+                                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black/20 pointer-events-none transition-all">
+                                                <Play size={40} className="fill-white" />
+                                            </div>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <div className="text-left">
+                                                <h4 className="font-black italic text-lg uppercase tracking-tight">{t.momentTitle(i)}</h4>
+                                                <p className="text-[10px] text-gray-500 font-bold">15S VERTICAL HD</p>
+                                            </div>
+                                            <button
+                                                onClick={(e) => onDownload(e, i)}
+                                                className="p-4 bg-emerald-500 hover:bg-emerald-600 rounded-2xl shadow-lg active:scale-90 transition-all cursor-pointer"
+                                                title="Download Video"
+                                            >
+                                                <Download size={24} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="flex gap-6">
+                                <button onClick={() => reset()} className="px-12 py-5 bg-white/5 hover:bg-white/10 rounded-3xl font-black uppercase text-xs tracking-widest transition-all cursor-pointer">
+                                    {t.processAlt}
+                                </button>
+                                <button onClick={(e) => onDownload(e, 0)} className="px-12 py-5 bg-emerald-600 hover:bg-emerald-700 rounded-3xl font-black uppercase text-xs tracking-widest transition-all shadow-2xl shadow-emerald-500/20 flex items-center gap-3 active:scale-95 cursor-pointer">
+                                    <Download size={20} />
+                                    {t.downloadAll}
+                                </button>
+                            </div>
+                        </motion.section>
+                    )}
+                </AnimatePresence>
             </main>
 
-            {/* Footer Hud */}
-            <footer className="flex-none px-8 py-3 bg-[#0D0D0F] border-t border-white/5 hidden md:flex items-center justify-between opacity-50 pointer-events-none">
+            {/* Status Bar */}
+            <footer className="w-full px-8 py-4 bg-[#0D0D0F] border-t border-white/5 flex flex-wrap justify-between items-center gap-4 opacity-40">
                 <div className="flex items-center gap-4 text-[10px] font-mono tracking-widest uppercase">
-                    <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                    Neural Engine Online // v2.0.4
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                    Neural Active // GPU_MODE: ON
                 </div>
-                <div className="flex items-center gap-8 text-[10px] font-black uppercase tracking-tighter">
-                    <div className="flex items-center gap-2 italic">TikTok Optimize <CheckCircle2 size={12} className="text-emerald-500" /></div>
-                    <div className="flex items-center gap-2 italic">Reels Optimize <CheckCircle2 size={12} className="text-emerald-500" /></div>
+                <div className="flex gap-8 text-[10px] font-black uppercase italic tracking-tight">
+                    <span>TikTok Optimized</span>
+                    <span>Reels Prepared</span>
+                    <span>Shorts Certified</span>
                 </div>
             </footer>
         </div>
