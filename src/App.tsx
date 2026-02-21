@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -10,8 +10,7 @@ import {
   ChevronRight,
   Zap,
   ShieldCheck,
-  Cpu,
-  Languages
+  Cpu
 } from 'lucide-react';
 
 const translations = {
@@ -35,7 +34,7 @@ const translations = {
       },
       {
         path: '/clipper',
-        title: 'Viral Auto-Clipper',
+        title: 'Viral Studio',
         description: 'Transform long podcasts into TikToks/Reels with dynamic captions.',
         tag: 'VIRAL'
       },
@@ -79,7 +78,7 @@ const translations = {
       },
       {
         path: '/clipper',
-        title: 'Auto-Clipper Viral',
+        title: 'Viral Studio',
         description: 'Transformez des podcasts longs en TikToks/Reels avec des légendes dynamiques.',
         tag: 'VIRAL'
       },

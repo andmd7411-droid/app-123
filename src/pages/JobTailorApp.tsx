@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     ArrowLeft,
@@ -9,12 +9,15 @@ import {
     Copy,
     Check,
     Download,
-    AlertCircle,
-    Plus,
-    ArrowRight,
-    HelpCircle
+    ArrowRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+function cn(...inputs: ClassValue[]) {
+    return twMerge(clsx(inputs));
+}
 
 const translations = {
     en: {
@@ -116,7 +119,32 @@ export default function JobTailorApp() {
         setTimeout(() => setCopied(false), 2000);
     };
 
-    const cn = (...inputs: any[]) => inputs.filter(Boolean).join(' ');
+    const triggerDownload = (blob: Blob, fileName: string) => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        link.style.display = 'none';
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(() => {
+            if (document.body.contains(link)) {
+                document.body.removeChild(link);
+            }
+            URL.revokeObjectURL(url);
+        }, 1500);
+    };
+
+    const handleDownload = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!result) return;
+        const content = activeTab === 'cv' ? result.cv : activeTab === 'letter' ? result.letter : result.questions.join('\n');
+        const fileName = activeTab === 'cv' ? 'Tailored_CV.txt' : activeTab === 'letter' ? 'Cover_Letter.txt' : 'Interview_Prep.txt';
+        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+        triggerDownload(blob, fileName);
+    };
 
     return (
         <div className="flex flex-col h-screen bg-[#0A0A0B] text-white">
@@ -124,6 +152,7 @@ export default function JobTailorApp() {
             <header className="flex items-center justify-between px-6 py-4 bg-[#111113] border-b border-white/5">
                 <div className="flex items-center gap-4">
                     <button
+                        title={t.back}
                         onClick={() => navigate('/')}
                         className="p-2 hover:bg-white/5 rounded-xl transition-colors text-gray-400 hover:text-white"
                     >
@@ -225,7 +254,7 @@ export default function JobTailorApp() {
                                     {t.tabs.map(tab => (
                                         <button
                                             key={tab.id}
-                                            onClick={() => setActiveTab(tab.id as any)}
+                                            onClick={() => setActiveTab(tab.id as 'cv' | 'letter' | 'questions')}
                                             className={cn(
                                                 "px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all uppercase tracking-widest",
                                                 activeTab === tab.id
@@ -279,7 +308,11 @@ export default function JobTailorApp() {
                                             )}
                                         </div>
 
-                                        <button className="w-full py-4 border border-emerald-500/30 hover:bg-emerald-500/10 text-emerald-400 font-bold rounded-2xl flex items-center justify-center gap-2 transition-all">
+                                        <button
+                                            type="button"
+                                            onClick={(e) => handleDownload(e)}
+                                            className="w-full py-4 border border-emerald-500/30 hover:bg-emerald-500/10 text-emerald-400 font-bold rounded-2xl flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+                                        >
                                             <Download size={18} />
                                             {t.download}
                                         </button>

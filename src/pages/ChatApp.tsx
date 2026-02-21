@@ -13,7 +13,7 @@ import {
     Search,
     Lock
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -81,6 +81,12 @@ export default function ChatApp() {
     const scrollRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    useEffect(() => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        }
+    }, [messages, isProcessing]);
+
     const sendMessage = async (e?: React.FormEvent) => {
         e?.preventDefault();
         if (!input.trim()) return;
@@ -88,7 +94,7 @@ export default function ChatApp() {
         const userMsg: Message = {
             id: Date.now().toString(),
             role: 'user',
-            content: input,
+            content: input.trim(),
             timestamp: new Date()
         };
 
@@ -126,6 +132,7 @@ export default function ChatApp() {
             <header className="flex items-center justify-between px-6 py-4 bg-[#111113] border-b border-white/5">
                 <div className="flex items-center gap-4">
                     <button
+                        title="Back to Hub"
                         onClick={() => navigate('/')}
                         className="p-2 hover:bg-white/5 rounded-xl transition-colors text-gray-400 hover:text-white"
                     >
@@ -160,12 +167,14 @@ export default function ChatApp() {
                         <button
                             onClick={() => fileInputRef.current?.click()}
                             className="w-full flex items-center justify-center gap-2 py-3 bg-indigo-600 hover:bg-indigo-700 rounded-2xl font-bold transition-all shadow-lg shadow-indigo-500/10"
+                            title={t.upload}
                         >
                             <Upload size={18} />
                             {t.upload}
                         </button>
                         <input
                             type="file"
+                            title={t.upload}
                             ref={fileInputRef}
                             className="hidden"
                             accept=".pdf,.doc,.docx,.txt"
@@ -184,7 +193,7 @@ export default function ChatApp() {
                                     <p className="text-sm font-medium truncate">{file.name}</p>
                                     <p className="text-[10px] text-gray-500">{(file.size / 1024).toFixed(1)} KB</p>
                                 </div>
-                                <button onClick={() => setFile(null)} className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-white/10 rounded-lg transition-all text-gray-500 hover:text-rose-400">
+                                <button onClick={() => setFile(null)} className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-white/10 rounded-lg transition-all text-gray-500 hover:text-rose-400" title="Remove document">
                                     <Trash2 size={14} />
                                 </button>
                             </div>
@@ -215,6 +224,7 @@ export default function ChatApp() {
                                             key={hint}
                                             onClick={() => setInput(hint)}
                                             className="px-4 py-3 bg-white/[0.03] border border-white/[0.05] hover:border-indigo-500/30 rounded-2xl text-sm text-gray-300 hover:text-white transition-all text-left"
+                                            title={hint}
                                         >
                                             "{hint}"
                                         </button>
@@ -277,6 +287,7 @@ export default function ChatApp() {
                                     type="button"
                                     className="p-3 text-gray-500 hover:text-indigo-400 transition-colors"
                                     onClick={() => fileInputRef.current?.click()}
+                                    title="Attach file"
                                 >
                                     <Paperclip size={20} />
                                 </button>
@@ -289,6 +300,7 @@ export default function ChatApp() {
                                 />
                                 <button
                                     type="submit"
+                                    title="Send message"
                                     disabled={!input.trim() || isProcessing}
                                     className="p-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-white/5 disabled:hover:bg-white/5 disabled:text-gray-700 text-white rounded-xl transition-all m-1.5"
                                 >
