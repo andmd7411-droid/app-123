@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
     ArrowLeft,
     Video,
-    Scissors,
-    Type,
+    Video,
     Smartphone,
     Play,
     Pause,
