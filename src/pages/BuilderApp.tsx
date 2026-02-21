@@ -17,54 +17,67 @@ import {
     Smartphone,
     Tablet,
     Eye,
-    Trash2
+    Trash2,
+    RotateCcw,
+    Sparkles,
+    Zap,
+    Box
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+
+function cn(...inputs: ClassValue[]) {
+    return twMerge(clsx(inputs));
+}
 
 const translations = {
     en: {
         back: "Back to Hub",
-        title: "Design-to-Code Builder",
-        components: "Components",
-        layers: "Layers",
-        emptyCanvas: "Empty Canvas",
-        selectComponent: "Select a component from the left",
-        realTime: "Real-time preview",
-        generatedCode: "Generated Code (React)",
-        properties: "Properties",
-        labelText: "Label / Text",
-        instantFeedback: "Changes are reflected instantly in the code on the right.",
-        selectToEdit: "Select an element on the canvas to edit.",
-        copyCode: "COPY CODE",
-        copied: "COPIED",
+        title: "Architect-AI / Builder",
+        subtitle: "Neural Component Synthesis",
+        components: "Elements",
+        layers: "Node Tree",
+        emptyCanvas: "Void Canvas",
+        selectComponent: "Provision elements from the genesis panel",
+        realTime: "Live Neural Synthesis",
+        generatedCode: "Native TSX Pipeline",
+        properties: "Parameters",
+        labelText: "DATA_STRING",
+        instantFeedback: "Modifications propagate instantly through the synthesis pipeline.",
+        selectToEdit: "Select a node to adjust parameters.",
+        copyCode: "CAPTURE CODE",
+        copied: "SYNCED",
+        clear: "FLUSH CANVAS",
         elementLabels: {
-            button: 'Button',
-            input: 'Input',
-            card: 'Card',
-            text: 'Text'
+            button: 'Action_Trigger',
+            input: 'Data_Entry',
+            card: 'Display_Cell',
+            text: 'Label_Node'
         }
     },
     fr: {
         back: "Retour au Hub",
-        title: "Builder Design-to-Code",
-        components: "Composants",
-        layers: "Couches",
+        title: "IA Architecte / Builder",
+        subtitle: "Synthèse de Composants Neuronaux",
+        components: "Éléments",
+        layers: "Arbre de Noeuds",
         emptyCanvas: "Canevas Vide",
-        selectComponent: "Sélectionnez un composant à gauche",
-        realTime: "Aperçu en temps réel",
-        generatedCode: "Code Généré (React)",
-        properties: "Propriétés",
-        labelText: "Label / Texte",
-        instantFeedback: "Les changements sont reflétés instantanément dans le code à droite.",
-        selectToEdit: "Sélectionnez un élément sur le canevas pour l'éditer.",
-        copyCode: "COPIER LE CODE",
-        copied: "COPIÉ",
+        selectComponent: "Provisionnez des éléments depuis le panneau genèse",
+        realTime: "Synthèse Neuronale en Direct",
+        generatedCode: "Pipeline TSX Natif",
+        properties: "Paramètres",
+        labelText: "CHAINE_DONNEES",
+        instantFeedback: "Les modifications se propagent instantanément dans le pipeline.",
+        selectToEdit: "Sélectionnez un noeud pour ajuster les paramètres.",
+        copyCode: "CAPTURER CODE",
+        copied: "SYNCHRONISÉ",
+        clear: "VIDER LE CANEVAS",
         elementLabels: {
-            button: 'Bouton',
-            input: 'Entrée',
-            card: 'Carte',
-            text: 'Texte'
+            button: 'Action_Trigger',
+            input: 'Entree_Donnees',
+            card: 'Cellule_Affichage',
+            text: 'Noeud_Label'
         }
     }
 };
@@ -75,7 +88,7 @@ interface Element {
     label: string;
 }
 
-const SESSION_PREFIX = Math.floor(Math.random() * 1000000);
+const SESSION_PREFIX = Math.floor(Math.random() * 1000);
 
 export default function BuilderApp() {
     const navigate = useNavigate();
@@ -92,7 +105,7 @@ export default function BuilderApp() {
 
     const addElement = (elementType: Element['type']) => {
         idCounter.current += 1;
-        const id = `el-${SESSION_PREFIX}-${idCounter.current}`;
+        const id = `NODE-${SESSION_PREFIX}-${idCounter.current}`;
         const newEl: Element = {
             id,
             type: elementType,
@@ -102,16 +115,21 @@ export default function BuilderApp() {
         setSelectedId(id);
     };
 
+    const clearCanvas = () => {
+        setElements([]);
+        setSelectedId(null);
+    };
+
     const generateCode = () => {
         const components = elements.map(el => {
-            if (el.type === 'button') return `      <button className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-purple-500/20">\n        ${el.label}\n      </button>`;
-            if (el.type === 'input') return `      <input className="w-full bg-[#161618] border border-white/10 rounded-xl px-4 py-2 focus:border-purple-500 outline-none transition-all" placeholder="${el.label}..." />`;
-            if (el.type === 'card') return `      <div className="bg-[#161618] p-6 rounded-3xl border border-white/5 shadow-xl">\n        <h3 className="font-bold mb-2">Card Title</h3>\n        <p className="text-sm text-gray-500">Design generated by Design-to-Code AI.</p>\n      </div>`;
-            if (el.type === 'text') return `      <p className="text-gray-400 text-sm leading-relaxed">${el.label}</p>`;
+            if (el.type === 'button') return `      <button className="px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-black italic uppercase transition-all shadow-2xl shadow-indigo-500/20">\n        ${el.label}\n      </button>`;
+            if (el.type === 'input') return `      <input className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 focus:border-indigo-500/50 outline-none transition-all placeholder:text-gray-700" placeholder="${el.label}..." />`;
+            if (el.type === 'card') return `      <div className="bg-[#111113] p-10 rounded-[40px] border border-white/5 shadow-3xl group hover:border-indigo-500/20 transition-all">\n        <h3 className="text-xl font-black italic uppercase italic tracking-tight mb-2">Display Cell</h3>\n        <p className="text-sm text-gray-500 leading-relaxed font-medium">Rendered via Neural Builder Engine.</p>\n      </div>`;
+            if (el.type === 'text') return `      <p className="text-gray-400 text-sm leading-relaxed font-medium">${el.label}</p>`;
             return '';
         }).join('\n\n');
 
-        return `// Optimized React + Tailwind Code\nimport React from 'react';\n\nexport default function GeneratedComponent() {\n  return (\n    <div className="p-8 space-y-6 max-w-md mx-auto bg-[#0A0A0B] min-h-screen text-white">\n${components}\n    </div>\n  );\n}`;
+        return `// High-Performance React + Tailwind Component\n// Generated by Architect-AI Node ${SESSION_PREFIX}\n\nimport React from 'react';\n\nexport default function SynthesisComponent() {\n  return (\n    <div className="p-12 space-y-8 max-w-2xl mx-auto bg-[#0A0A0B] min-h-[600px] text-white font-outfit">\n${components}\n    </div>\n  );\n}`;
     };
 
     const copyCode = () => {
@@ -120,54 +138,45 @@ export default function BuilderApp() {
         setTimeout(() => setCopied(false), 2000);
     };
 
-    const triggerDownload = (blob: Blob, fileName: string) => {
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = fileName;
-        link.style.display = 'none';
-        link.target = '_blank';
-        document.body.appendChild(link);
-        link.click();
-        setTimeout(() => {
-            if (document.body.contains(link)) {
-                document.body.removeChild(link);
-            }
-            URL.revokeObjectURL(url);
-        }, 1500);
-    };
-
     const handleDownload = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
         const code = generateCode();
         const blob = new Blob([code], { type: 'text/plain;charset=utf-8' });
-        triggerDownload(blob, 'GeneratedComponent.tsx');
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'SynthesisComponent.tsx';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     };
 
-    const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
-
     return (
-        <div className="flex flex-col h-screen bg-[#0A0A0B] text-white">
-            {/* Top Bar */}
-            <header className="flex items-center justify-between px-6 py-4 bg-[#111113] border-b border-white/5 relative z-20">
-                <div className="flex items-center gap-4">
+        <div className="flex flex-col h-screen bg-[#0A0A0B] text-white font-outfit overflow-hidden">
+            {/* Nav Bar */}
+            <header className="flex items-center justify-between px-8 py-4 bg-[#0D0D0F]/95 backdrop-blur-xl border-b border-white/5 z-50 shadow-2xl">
+                <div className="flex items-center gap-6">
                     <button
                         title={t.back}
                         onClick={() => navigate('/')}
-                        className="p-2 hover:bg-white/5 rounded-xl transition-colors text-gray-400 hover:text-white"
+                        className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl transition-all text-gray-400 hover:text-white cursor-pointer"
                     >
-                        <ArrowLeft size={20} />
+                        <ArrowLeft size={18} />
                     </button>
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-purple-500/10 rounded-lg">
-                            <Code2 className="text-purple-400 w-5 h-5" />
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 bg-purple-500/10 rounded-2xl border border-purple-500/20 shadow-inner">
+                            <Code2 className="text-purple-400 w-6 h-6" />
                         </div>
-                        <h1 className="text-sm font-bold">{t.title}</h1>
+                        <div>
+                            <h1 className="text-lg font-black tracking-tight uppercase italic">{t.title}</h1>
+                            <p className="text-[10px] text-purple-500/60 font-black uppercase tracking-[0.2em]">{t.subtitle}</p>
+                        </div>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2 bg-white/5 rounded-xl p-1 border border-white/5">
+                <div className="flex items-center gap-3 bg-white/5 rounded-2xl p-1.5 border border-white/5 shadow-inner">
                     {[
                         { id: 'desktop', icon: Monitor },
                         { id: 'tablet', icon: Tablet },
@@ -179,8 +188,8 @@ export default function BuilderApp() {
                             title={mode.id}
                             onClick={() => setPreviewMode(mode.id as 'desktop' | 'tablet' | 'mobile')}
                             className={cn(
-                                "p-2 rounded-lg transition-all",
-                                previewMode === mode.id ? "bg-purple-600 text-white" : "text-gray-500 hover:text-white"
+                                "px-4 py-2 rounded-xl transition-all cursor-pointer",
+                                previewMode === mode.id ? "bg-purple-600 text-white shadow-lg" : "text-gray-500 hover:text-white"
                             )}
                         >
                             <mode.icon size={16} />
@@ -188,11 +197,11 @@ export default function BuilderApp() {
                     ))}
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
                     <button
                         type="button"
                         onClick={copyCode}
-                        className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all font-bold text-xs text-gray-400 hover:text-white"
+                        className="flex items-center gap-3 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-purple-500/20 rounded-[20px] transition-all font-black text-[10px] text-gray-400 hover:text-purple-400 uppercase tracking-widest cursor-pointer"
                         title={t.copyCode}
                     >
                         {copied ? <Check size={14} /> : <Copy size={14} />}
@@ -200,164 +209,233 @@ export default function BuilderApp() {
                     </button>
                     <button
                         type="button"
-                        title="Download"
+                        title="Download Build"
                         onClick={(e) => handleDownload(e)}
-                        className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-xl transition-all font-bold text-xs"
+                        className="p-3 bg-purple-600 hover:bg-purple-500 rounded-2xl transition-all shadow-2xl shadow-purple-500/20 active:scale-95 cursor-pointer"
                     >
-                        <Download size={14} />
+                        <Download size={20} />
                     </button>
                 </div>
             </header>
 
             <div className="flex-1 flex overflow-hidden">
-                {/* Left Sidebar: Components */}
-                <aside className="w-16 md:w-64 flex flex-col bg-[#0D0D0F] border-r border-white/5 p-4 py-8">
-                    <h3 className="hidden md:block text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-6 px-2">{t.components}</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {[
-                            { icon: Square, label: t.elementLabels.button, type: 'button' },
-                            { icon: Type, label: t.elementLabels.input, type: 'input' },
-                            { icon: Layout, label: t.elementLabels.card, type: 'card' },
-                            { icon: Type, label: t.elementLabels.text, type: 'text' }
-                        ].map((item) => (
-                            <button
-                                type="button"
-                                key={item.label}
-                                onClick={() => addElement(item.type as 'button' | 'input' | 'card' | 'text')}
-                                className="flex flex-col items-center justify-center p-4 bg-white/[0.02] border border-white/5 rounded-2xl hover:border-purple-500/50 hover:bg-purple-500/[0.02] transition-all group"
-                            >
-                                <item.icon size={20} className="text-gray-500 group-hover:text-purple-400 mb-2" />
-                                <span className="hidden md:block text-[10px] font-bold text-gray-500 group-hover:text-white uppercase tracking-tighter">{item.label}</span>
-                            </button>
-                        ))}
+                {/* Registry Panel */}
+                <aside className="w-16 md:w-80 flex flex-col bg-[#0D0D0F] border-r border-white/5 p-8 shadow-3xl overflow-y-auto custom-scrollbar">
+                    <div className="mb-12">
+                        <div className="flex items-center gap-3 mb-8 px-2">
+                            <Box size={14} className="text-purple-500" />
+                            <h3 className="hidden md:block text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">{t.components}</h3>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {[
+                                { icon: Square, label: 'TRIGGER', type: 'button' },
+                                { icon: Type, label: 'ENTRY', type: 'input' },
+                                { icon: Layout, label: 'CELL', type: 'card' },
+                                { icon: Type, label: 'TEXT', type: 'text' }
+                            ].map((item) => (
+                                <button
+                                    type="button"
+                                    key={item.label}
+                                    onClick={() => addElement(item.type as 'button' | 'input' | 'card' | 'text')}
+                                    className="flex flex-col items-center justify-center p-6 bg-white/[0.02] border border-white/5 rounded-[28px] hover:border-purple-500/40 hover:bg-purple-500/[0.02] transition-all group cursor-pointer shadow-xl relative active:scale-95"
+                                >
+                                    <item.icon size={24} className="text-gray-600 group-hover:text-purple-400 mb-3 transition-colors" />
+                                    <span className="hidden md:block text-[9px] font-black text-gray-600 group-hover:text-white uppercase tracking-widest">{item.label}</span>
+                                </button>
+                            ))}
+                        </div>
                     </div>
 
-                    <div className="mt-12">
-                        <h3 className="hidden md:block text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-4 px-2">{t.layers}</h3>
-                        <div className="space-y-2">
-                            {elements.map(el => (
-                                <div
-                                    key={el.id}
-                                    onClick={() => setSelectedId(el.id)}
-                                    className={cn(
-                                        "flex items-center gap-3 px-3 py-2 rounded-xl text-xs cursor-pointer transition-all",
-                                        selectedId === el.id ? "bg-purple-500/10 text-purple-400 border border-purple-500/20" : "text-gray-500 hover:bg-white/5 hover:text-white"
-                                    )}
-                                >
-                                    <Layers size={14} />
-                                    <span className="hidden md:block">{el.label}</span>
-                                </div>
-                            ))}
+                    <div className="flex-1">
+                        <div className="flex items-center justify-between mb-8 px-2">
+                            <div className="flex items-center gap-3">
+                                <Layers size={14} className="text-purple-500" />
+                                <h3 className="hidden md:block text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">{t.layers}</h3>
+                            </div>
+                            {elements.length > 0 && (
+                                <button onClick={clearCanvas} className="text-[9px] text-gray-700 hover:text-rose-500 font-black uppercase tracking-widest cursor-pointer flex items-center gap-2">
+                                    <RotateCcw size={10} />
+                                    {t.clear.split(' ')[0]}
+                                </button>
+                            )}
+                        </div>
+                        <div className="space-y-3">
+                            <AnimatePresence>
+                                {elements.map((el, idx) => (
+                                    <motion.div
+                                        key={el.id}
+                                        initial={{ opacity: 0, x: -10 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: -10 }}
+                                        onClick={() => setSelectedId(el.id)}
+                                        className={cn(
+                                            "flex items-center gap-4 px-5 py-4 rounded-[20px] text-xs cursor-pointer transition-all border group",
+                                            selectedId === el.id
+                                                ? "bg-purple-600 text-white border-purple-500 shadow-xl"
+                                                : "text-gray-500 border-transparent hover:bg-white/5 hover:text-white"
+                                        )}
+                                    >
+                                        <span className="text-[10px] font-black opacity-30 italic">#{idx + 1}</span>
+                                        <span className="hidden md:block font-black uppercase tracking-widest text-[10px]">{el.label}</span>
+                                    </motion.div>
+                                ))}
+                            </AnimatePresence>
                         </div>
                     </div>
                 </aside>
 
-                {/* Center: Canvas */}
-                <main className="flex-1 flex flex-col bg-black relative p-8 items-center justify-start overflow-y-auto">
-                    <div
+                {/* Synthesis Environment */}
+                <main className="flex-1 flex flex-col bg-black relative p-6 md:p-14 items-center justify-start overflow-y-auto custom-scrollbar">
+                    <div className="absolute inset-0 bg-[#0A0A0B] opacity-50 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.03) 1px, transparent 0)', backgroundSize: '40px 40px' }} />
+
+                    <motion.div
+                        layout
                         className={cn(
-                            "bg-[#0A0A0B] border border-white/5 rounded-[40px] shadow-3xl transition-all duration-500 min-h-[600px] p-12 space-y-8 flex flex-col",
-                            previewMode === 'desktop' ? "w-full max-w-4xl" : previewMode === 'tablet' ? "w-[600px]" : "w-[360px]"
+                            "bg-[#0D0D0F] border border-white/5 rounded-[56px] shadow-[0_0_100px_rgba(0,0,0,0.8)] transition-all duration-700 min-h-[700px] p-16 space-y-10 flex flex-col relative z-10",
+                            previewMode === 'desktop' ? "w-full max-w-5xl" : previewMode === 'tablet' ? "w-[640px]" : "w-[380px]"
                         )}
                     >
-                        {elements.length === 0 ? (
-                            <div className="flex-1 flex flex-col items-center justify-center text-center opacity-20 border-2 border-dashed border-white/10 rounded-[32px]">
-                                <MousePointer2 className="mb-4" />
-                                <p className="text-sm font-bold uppercase tracking-widest">{t.emptyCanvas}</p>
-                                <p className="text-xs">{t.selectComponent}</p>
-                            </div>
-                        ) : (
-                            elements.map((el) => (
-                                <div
-                                    key={el.id}
-                                    onClick={(e) => { e.stopPropagation(); setSelectedId(el.id); }}
-                                    className={cn(
-                                        "relative transition-all",
-                                        selectedId === el.id ? "ring-2 ring-purple-500/50 rounded-xl" : ""
-                                    )}
+                        <AnimatePresence mode="wait">
+                            {elements.length === 0 ? (
+                                <motion.div
+                                    key="empty"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    className="flex-1 flex flex-col items-center justify-center text-center opacity-30 border-2 border-dashed border-white/5 rounded-[40px] p-10"
                                 >
-                                    {el.type === 'button' && (
-                                        <button className="px-6 py-2 bg-purple-600 text-white rounded-xl font-bold shadow-lg shadow-purple-500/20 active:scale-95 transition-all">
-                                            {el.label}
-                                        </button>
-                                    )}
-                                    {el.type === 'input' && (
-                                        <input className="w-full bg-[#161618] border border-white/10 rounded-xl px-4 py-2 focus:border-purple-500 outline-none transition-all" placeholder={el.label + "..."} />
-                                    )}
-                                    {el.type === 'card' && (
-                                        <div className="bg-[#161618] p-6 rounded-3xl border border-white/5 shadow-xl">
-                                            <div className="w-12 h-1 w-full bg-white/5 rounded-full mb-4" />
-                                            <h3 className="font-bold mb-2 text-lg">{el.label}</h3>
-                                            <p className="text-sm text-gray-500 leading-relaxed">{lang === 'en' ? 'Generated container.' : 'Conteneur généré.'}</p>
-                                        </div>
-                                    )}
-                                    {el.type === 'text' && (
-                                        <p className="text-gray-400 text-sm leading-relaxed">{el.label}</p>
-                                    )}
-
-                                    {selectedId === el.id && (
-                                        <button
-                                            type="button"
-                                            onClick={() => { setElements(elements.filter(e => e.id !== el.id)); setSelectedId(null); }}
-                                            className="absolute -right-2 -top-2 w-6 h-6 bg-rose-600 hover:bg-rose-700 rounded-full flex items-center justify-center border-2 border-black transition-all shadow-lg"
-                                            title="Delete element"
+                                    <div className="relative mb-10">
+                                        <div className="w-24 h-24 bg-purple-500/10 rounded-[32px] animate-pulse" />
+                                        <MousePointer2 className="absolute inset-0 m-auto text-purple-500" size={32} />
+                                    </div>
+                                    <h3 className="text-3xl font-black uppercase italic tracking-tighter mb-4">{t.emptyCanvas}</h3>
+                                    <p className="text-xs font-medium text-gray-400 max-w-[200px]">{t.selectComponent}</p>
+                                </motion.div>
+                            ) : (
+                                <div className="space-y-8">
+                                    {elements.map((el) => (
+                                        <motion.div
+                                            key={el.id}
+                                            layout
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            onClick={(e) => { e.stopPropagation(); setSelectedId(el.id); }}
+                                            className={cn(
+                                                "relative transition-all group",
+                                                selectedId === el.id ? "ring-2 ring-purple-500/50 rounded-2xl scale-[1.02]" : "hover:scale-[1.01]"
+                                            )}
                                         >
-                                            <Trash2 size={10} className="text-white" />
-                                        </button>
-                                    )}
-                                </div>
-                            ))
-                        )}
-                    </div>
+                                            {el.type === 'button' && (
+                                                <button className="px-10 py-4 bg-purple-600 text-white rounded-[24px] font-black italic uppercase tracking-widest text-xs shadow-2xl shadow-purple-500/20 transition-all">
+                                                    {el.label}
+                                                </button>
+                                            )}
+                                            {el.type === 'input' && (
+                                                <input className="w-full bg-white/[0.03] border border-white/10 rounded-[28px] px-8 py-5 focus:border-purple-500/50 outline-none transition-all placeholder:text-gray-800 font-bold" placeholder={el.label + "..."} disabled />
+                                            )}
+                                            {el.type === 'card' && (
+                                                <div className="bg-[#161618] p-10 rounded-[48px] border border-white/5 shadow-3xl text-left">
+                                                    <div className="w-16 h-1 bg-purple-500 rounded-full mb-6" />
+                                                    <h3 className="text-xl font-black mb-3 italic uppercase tracking-tight">{el.label}</h3>
+                                                    <p className="text-gray-500 text-sm leading-relaxed font-medium">{lang === 'en' ? 'Generated container node.' : 'Noeud de conteneur généré.'}</p>
+                                                </div>
+                                            )}
+                                            {el.type === 'text' && (
+                                                <p className="text-gray-400 text-base leading-relaxed font-medium px-4">{el.label}</p>
+                                            )}
 
-                    <div className="mt-8 flex items-center gap-2 text-gray-600 text-[10px] font-black tracking-widest uppercase">
-                        <Eye size={12} />
+                                            {selectedId === el.id && (
+                                                <div className="absolute -right-3 -top-3 flex gap-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={(e) => { e.stopPropagation(); setElements(elements.filter(e => e.id !== el.id)); setSelectedId(null); }}
+                                                        className="w-8 h-8 bg-rose-600 hover:bg-rose-500 rounded-full flex items-center justify-center border-2 border-black transition-all shadow-2xl cursor-pointer"
+                                                        title="Flush node"
+                                                    >
+                                                        <Trash2 size={14} className="text-white" />
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </motion.div>
+                                    ))}
+                                </div>
+                            )}
+                        </AnimatePresence>
+                    </motion.div>
+
+                    <div className="mt-12 flex items-center gap-3 text-gray-700 text-[10px] font-black tracking-[0.4em] uppercase">
+                        <Sparkles size={14} className="text-purple-500/50" />
                         {t.realTime}
                     </div>
                 </main>
 
-                {/* Right Sidebar: Code & Properties */}
-                <aside className="hidden xl:flex w-80 flex-col bg-[#0D0D0F] border-l border-white/5">
+                {/* Properties & Pipeline Panel */}
+                <aside className="hidden xl:flex w-96 flex-col bg-[#0D0D0F] border-l border-white/5 shadow-3xl">
                     <div className="flex-1 flex flex-col overflow-hidden">
-                        <div className="p-4 border-b border-white/5 bg-[#111113] flex items-center gap-2">
-                            <Terminal size={16} className="text-gray-400" />
-                            <span className="text-[10px] font-bold uppercase tracking-widest">{t.generatedCode}</span>
+                        <div className="p-8 border-b border-white/5 bg-[#111113] flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <Terminal size={18} className="text-purple-500" />
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em]">{t.generatedCode}</span>
+                            </div>
+                            <div className="flex gap-1">
+                                <div className="w-1.5 h-1.5 rounded-full bg-rose-500/50" />
+                                <div className="w-1.5 h-1.5 rounded-full bg-amber-500/50" />
+                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/50" />
+                            </div>
                         </div>
-                        <div className="flex-1 p-4 bg-black overflow-hidden relative group">
-                            <pre className="text-[11px] font-mono text-gray-400 leading-normal h-full overflow-y-auto custom-scrollbar">
+                        <div className="flex-1 p-8 bg-black/50 overflow-hidden relative group font-mono">
+                            <pre className="text-[11px] text-gray-500 leading-relaxed h-full overflow-y-auto custom-scrollbar">
                                 <code>{generateCode()}</code>
                             </pre>
-                            <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent pointer-events-none h-20 top-auto" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D0F] to-transparent pointer-events-none h-32 top-auto" />
                         </div>
                     </div>
 
-                    <div className="p-6 bg-[#111113] border-t border-white/5">
-                        <div className="flex items-center gap-2 mb-4">
-                            <Settings2 size={16} className="text-gray-400" />
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-white">{t.properties}</span>
+                    <div className="p-10 bg-[#111113]/95 backdrop-blur-xl border-t border-white/5">
+                        <div className="flex items-center gap-4 mb-8">
+                            <Settings2 size={20} className="text-purple-500" />
+                            <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white italic">{t.properties}</span>
                         </div>
 
-                        {selectedId ? (
-                            <div className="space-y-4">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] text-gray-500 uppercase font-black">{t.labelText}</label>
-                                    <input
-                                        type="text"
-                                        title={t.labelText}
-                                        value={elements.find(e => e.id === selectedId)?.label || ''}
-                                        onChange={(e) => {
-                                            setElements(elements.map(el => el.id === selectedId ? { ...el, label: e.target.value } : el));
-                                        }}
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs focus:border-purple-500 outline-none transition-all"
-                                    />
-                                </div>
-                                <div className="p-4 bg-purple-500/5 rounded-2xl border border-purple-500/10 text-center">
-                                    <p className="text-[10px] text-purple-400 font-bold leading-relaxed tracking-tighter">{t.instantFeedback}</p>
-                                </div>
-                            </div>
-                        ) : (
-                            <p className="text-xs text-center py-8 text-gray-600">{t.selectToEdit}</p>
-                        )}
+                        <AnimatePresence mode="wait">
+                            {selectedId ? (
+                                <motion.div
+                                    key="props"
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="space-y-8"
+                                >
+                                    <div className="space-y-4">
+                                        <label className="text-[10px] text-gray-600 uppercase font-black tracking-widest">{t.labelText}</label>
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                title={t.labelText}
+                                                value={elements.find(e => e.id === selectedId)?.label || ''}
+                                                onChange={(e) => {
+                                                    setElements(elements.map(el => el.id === selectedId ? { ...el, label: e.target.value } : el));
+                                                }}
+                                                className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm font-black italic focus:border-purple-500/50 outline-none transition-all"
+                                            />
+                                            <Zap className="absolute right-4 top-1/2 -translate-y-1/2 text-purple-500 opacity-30" size={14} />
+                                        </div>
+                                    </div>
+                                    <div className="p-6 bg-purple-500/5 rounded-3xl border border-purple-500/10 flex gap-4">
+                                        <Sparkles className="text-purple-400 shrink-0" size={18} />
+                                        <p className="text-[10px] text-gray-400 font-bold leading-relaxed">{t.instantFeedback}</p>
+                                    </div>
+                                </motion.div>
+                            ) : (
+                                <motion.div
+                                    key="no-props"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    className="text-center py-16 opacity-20"
+                                >
+                                    <MousePointer2 className="mx-auto mb-6" size={32} />
+                                    <p className="text-[10px] font-black uppercase tracking-widest">{t.selectToEdit}</p>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
                 </aside>
             </div>
