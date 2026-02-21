@@ -172,6 +172,7 @@ export default function ClipperApp() {
     };
 
     const triggerDownload = (blob: Blob, fileName: string) => {
+        console.log(`Triggering download for: ${fileName}`);
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
@@ -182,16 +183,19 @@ export default function ClipperApp() {
         setTimeout(() => {
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
+            console.log(`Resources cleaned up for: ${fileName}`);
         }, 1500);
     };
 
     const handleExport = () => {
+        console.log("Starting Export Process...");
         setIsProcessing(true);
         let p = 0;
         const interval = setInterval(() => {
-            p += 2;
-            setProgress(p);
+            p += 4; // Faster for better feel
+            setProgress(Math.min(p, 100));
             if (p >= 100) {
+                console.log("Export Process Complete - Switching to Export View");
                 clearInterval(interval);
                 setIsProcessing(false);
                 setStep('export');

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Redirecting...</title>
+    <script type="text/javascript">
+      // Simple redirect for GitHub Pages to handle clean URLs with HashRouter
+      var path = window.location.pathname;
+      var base = '/app-123/'; 
+      if (path.startsWith(base)) {
+        var subPath = path.slice(base.length);
+        if (subPath && subPath !== 'index.html') {
+          window.location.replace(base + '#/' + subPath);
+        } else {
+          window.location.replace(base);
+        }
+      } else {
+        window.location.replace(base);
+      }
+    </script>
+  </head>
+  <body>
+    Redirecting to the app...
+  </body>
+</html>
