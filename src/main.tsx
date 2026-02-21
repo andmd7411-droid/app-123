@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import App from './App.tsx';
 import './index.css';
 
@@ -13,7 +13,7 @@ import BuilderApp from './pages/BuilderApp.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter basename={import.meta.env.BASE_URL}>
+    <Router>
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/chat" element={<ChatApp />} />
@@ -22,6 +22,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Route path="/freelance" element={<FreelancerApp />} />
         <Route path="/builder" element={<BuilderApp />} />
       </Routes>
-    </BrowserRouter>
+    </Router>
   </React.StrictMode>,
 );

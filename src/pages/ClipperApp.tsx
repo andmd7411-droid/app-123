@@ -284,6 +284,7 @@ export default function ClipperApp() {
                                         </div>
                                         <input
                                             type="file"
+                                            title={t.uploadBtn}
                                             ref={fileInputRef}
                                             className="hidden"
                                             accept="video/*"
@@ -416,6 +417,7 @@ export default function ClipperApp() {
 
                                         {/* Play Toggle */}
                                         <button
+                                            title={isPlaying ? "Pause" : "Play"}
                                             onClick={togglePlay}
                                             className="absolute inset-0 flex items-center justify-center group-hover:bg-black/20 transition-all opacity-0 group-hover:opacity-100"
                                         >
@@ -429,6 +431,7 @@ export default function ClipperApp() {
                                         {['#fbbf24', '#ffffff', '#fb7185', '#38bdf8'].map(c => (
                                             <button
                                                 key={c}
+                                                title={`Select color ${c}`}
                                                 onClick={() => setCaptionColor(c)}
                                                 className={`w-8 h-8 rounded-full border-2 transition-all ${captionColor === c ? 'border-white scale-110 shadow-lg' : 'border-transparent scale-90 hover:scale-100'}`}
                                                 style={{ backgroundColor: c }}
@@ -492,8 +495,8 @@ export default function ClipperApp() {
                                                     </div>
                                                 </div>
                                                 <div className="flex gap-2 p-1.5 bg-black/40 rounded-2xl border border-white/5">
-                                                    <button className="flex-1 py-1.5 bg-rose-600 rounded-xl text-[8px] font-black">HEAD_FOCUS</button>
-                                                    <button className="flex-1 py-1.5 hover:bg-white/5 transition-all text-[8px] font-black text-gray-600">BODY_SCAN</button>
+                                                    <button title="Focus on Head" className="flex-1 py-1.5 bg-rose-600 rounded-xl text-[8px] font-black">HEAD_FOCUS</button>
+                                                    <button title="Full Body Scan" className="flex-1 py-1.5 hover:bg-white/5 transition-all text-[8px] font-black text-gray-600">BODY_SCAN</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -563,7 +566,7 @@ export default function ClipperApp() {
                                                     <Smile size={14} className="text-white" />
                                                     <span className="text-[10px] font-black uppercase tracking-widest text-white">Viral Hook Detected</span>
                                                 </div>
-                                                <button className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+                                                <button title="Play Clip" className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
                                                     <div className="p-4 bg-emerald-500 rounded-full shadow-2xl">
                                                         <Play className="fill-white ml-1" size={24} />
                                                     </div>
