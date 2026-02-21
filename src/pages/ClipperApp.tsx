@@ -1,21 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    ArrowLeft,
     Video,
-    Smartphone,
     Play,
     Pause,
     Download,
     Sparkles,
-    Maximize2,
     CheckCircle2,
     Upload,
     Zap,
-    History,
-    Settings2,
-    Layers,
-    Smile,
     RotateCcw
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';

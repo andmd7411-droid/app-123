@@ -13,7 +13,7 @@ import BuilderApp from './pages/BuilderApp.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <Router basename="/app-123">
+    <Router>
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/chat" element={<ChatApp />} />
