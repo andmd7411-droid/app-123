@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
+ArrowLeft,
     Video,
     Play,
     Pause,
@@ -371,7 +371,7 @@ export default function ClipperApp() {
                                         <h2 className="text-5xl font-black italic uppercase tracking-tighter mb-2">{t.configTitle}</h2>
                                         <p className="text-gray-500">{t.configDesc}</p>
                                     </div>
-                                    <button onClick={() => reset()} className="p-4 bg-white/5 hover:bg-rose-500/10 rounded-2xl transition-all cursor-pointer">
+                                    <button title="Reset" onClick={() => reset()} className="p-4 bg-white/5 hover:bg-rose-500/10 rounded-2xl transition-all cursor-pointer">
                                         <RotateCcw className="text-gray-400" />
                                     </button>
                                 </div>
@@ -381,7 +381,7 @@ export default function ClipperApp() {
                                         <h3 className="text-xs font-black uppercase tracking-widest text-rose-500">{t.captions}</h3>
                                         <div className="flex flex-col gap-3">
                                             {t.captionStyles.map(s => (
-                                                <button key={s} className={`p-5 rounded-2xl border text-left text-xs font-bold uppercase transition-all ${s.includes('Hormozi') ? 'bg-rose-500/10 border-rose-500/50 text-white' : 'bg-white/5 border-white/5 text-gray-500 hover:bg-white/10'}`}>
+                                                <button title={`Apply ${s}`} key={s} className={`p-5 rounded-2xl border text-left text-xs font-bold uppercase transition-all ${s.includes('Hormozi') ? 'bg-rose-500/10 border-rose-500/50 text-white' : 'bg-white/5 border-white/5 text-gray-500 hover:bg-white/10'}`}>
                                                     {s}
                                                 </button>
                                             ))}
